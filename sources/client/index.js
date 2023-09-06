@@ -1,3 +1,5 @@
+import fetchRequest from "./fetchRequest.js"
+
 const dayWeek = Array.from(document.querySelectorAll(".page-nav__day-week"))
 const dayNumber = Array.from(document.querySelectorAll(".page-nav__day-number"))
 const nav = Array.from(document.querySelectorAll(".page-nav__day"))
@@ -67,7 +69,7 @@ async function getList() {
   return await response.json()
 }
 
-let list = getList().then((data) => {
+let list = fetchRequest("event=update").then((data) => {
   console.log(data)
   //   console.log(localStorage)
   for (let film in data.films.result) {
@@ -168,10 +170,14 @@ let list = getList().then((data) => {
                         <a class="movie-seances__time" 
                         href="hall.html" data-hallid=${
                           hallObject.hall_id
-                        } data-seanceid=${
-        data.seances.result[seance].seance_id
-      } data-seancetime=${
-        dateTimestamp / 1000 + data.seances.result[seance].seance_start * 60
+                        } data-hallconfig='${hallObject.hall_config}'
+                        data-hallpricestandart=${hallObject.hall_price_standart}
+                        data-hallpricevip=${hallObject.hall_price_vip}
+                        data-seanceid=${
+                          data.seances.result[seance].seance_id
+                        } data-seancetime=${
+        Math.trunc(dateTimestamp / 1000) +
+        data.seances.result[seance].seance_start * 60
       } data-seancestart=${
         data.seances.result[seance].seance_time
       } data-hallname=${hallObject.hall_name} 
@@ -198,6 +204,9 @@ let list = getList().then((data) => {
             localStorage.seanceStart = element.dataset.seancestart
             localStorage.filmName = element.dataset.filmname
             localStorage.hallName = element.dataset.hallname
+            localStorage.hallConfig = element.dataset.hallconfig
+            localStorage.hallPriceStandart = element.dataset.hallpricestandart
+            localStorage.hallPriceVip = element.dataset.hallpricevip
           }
         }
       )

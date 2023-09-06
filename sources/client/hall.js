@@ -1,6 +1,5 @@
 console.log(localStorage)
-const rows = Array.from(document.querySelectorAll(".conf-step__row"))
-let rowsObject = {}
+import fetchRequest from "./fetchRequest.js"
 
 document.querySelector(".buying__info-title").textContent =
   localStorage.getItem("filmName")
@@ -9,6 +8,17 @@ document
   .insertAdjacentText("beforeend", localStorage.getItem("seanceStart"))
 document.querySelector(".buying__info-hall").textContent =
   localStorage.getItem("hallName")
+document.querySelector(".conf-step__wrapper").innerHTML +=
+  localStorage.getItem("hallConfig")
+document.querySelector(".price-standart").textContent =
+  localStorage.getItem("hallPriceStandart")
+document.querySelector(".price-vip").textContent =
+  localStorage.getItem("hallPriceVip")
+
+const priceStandart = Number(localStorage.getItem("hallPriceStandart"))
+const priceVip = Number(localStorage.getItem("hallPriceVip"))
+let rowsObject = {}
+let hallConfiguration = ""
 
 // Получение актуальной схемы посадочных мест (Стабильно возвращает null)
 async function getConfig() {
@@ -27,7 +37,13 @@ async function getConfig() {
   return await response.json()
 }
 
-let config = getConfig().then((data) => console.log(data))
+let config = fetchRequest(
+  `event=get_hallConfig&timestamp=${localStorage.getItem(
+    "timestamp"
+  )}&hallId=${localStorage.getItem("hallId")}&seanceId=${localStorage.getItem(
+    "seanceId"
+  )}`
+).then((data) => console.log(data))
 
 Array.from(
   document
@@ -48,13 +64,20 @@ Array.from(
     } else {
       element.classList.add("conf-step__chair_selected")
     }
-
-    // getRowChair()
   }
 })
 
 document.querySelector(".acceptin-button").addEventListener("click", () => {
   localStorage.selectedPlaces = getRowChair().join(", ")
+  fetchRequest(
+    `event=sale_add&timestamp=${localStorage.getItem(
+      "timestamp"
+    )}}&hallId=${localStorage.getItem(
+      "hallId"
+    )}&seanceId=${localStorage.getItem(
+      "seanceId"
+    )}&hallConfiguration=${hallConfiguration}`
+  )
 
   //     //     // fetch("https://jscp-diplom.netoserver.ru/", {
   //     //     // method: "POST",
@@ -66,6 +89,8 @@ document.querySelector(".acceptin-button").addEventListener("click", () => {
 })
 
 function getRowChair() {
+  const rows = Array.from(document.querySelectorAll(".conf-step__row"))
+
   for (let i = 1; i < rows.length + 1; i++) {
     rowsObject[i] = Array.from(
       rows[i - 1].querySelectorAll(".conf-step__chair")
@@ -79,15 +104,28 @@ function getRowChair() {
   }
 
   let selectedPlaces = []
+  let cost = 0
 
   for (let row in rowsObject) {
     rowsObject[row].forEach((element) => {
       if (element.classList.contains("conf-step__chair_selected")) {
         selectedPlaces.push(`${row}/${rowsObject[row].indexOf(element) + 1}`)
+        if (element.classList.contains("conf-step__chair_standart")) {
+          cost += priceStandart
+        }
+
+        if (element.classList.contains("conf-step__chair_vip")) {
+          cost += priceVip
+        }
         element.classList.remove("conf-step__chair_selected")
         element.classList.add("conf-step__chair_taken")
       }
     })
   }
+
+  localStorage.totalCost = cost
+  hallConfiguration = document
+    .querySelector(".conf-step__wrapper")
+    .cloneNode(true).outerHTML
   return selectedPlaces
 }
