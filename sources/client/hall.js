@@ -8,8 +8,6 @@ document
   .insertAdjacentText("beforeend", localStorage.getItem("seanceStart"))
 document.querySelector(".buying__info-hall").textContent =
   localStorage.getItem("hallName")
-document.querySelector(".conf-step__wrapper").innerHTML +=
-  localStorage.getItem("hallConfig")
 document.querySelector(".price-standart").textContent =
   localStorage.getItem("hallPriceStandart")
 document.querySelector(".price-vip").textContent =
@@ -21,21 +19,23 @@ let rowsObject = {}
 let hallConfiguration = ""
 
 // Получение актуальной схемы посадочных мест (Стабильно возвращает null)
-async function getConfig() {
-  const response = await fetch("https://jscp-diplom.netoserver.ru/", {
-    method: "POST",
-    body: `event=get_hallConfig&timestamp=${localStorage.getItem(
-      "timestamp"
-    )}&hallId=${localStorage.getItem("hallId")}&seanceId=${localStorage.getItem(
-      "seanceId"
-    )}`,
-    headers: {
-      "Content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-    },
-  })
+// async function getConfig() {
+//   const response = await fetch("https://jscp-diplom.netoserver.ru/", {
+//     method: "POST",
+//     body: `event=get_hallConfig&timestamp=${localStorage.getItem(
+//       "timestamp"
+//     )}&hallId=${localStorage.getItem("hallId")}&seanceId=${localStorage.getItem(
+//       "seanceId"
+//     )}`,
+//     headers: {
+//       "Content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+//     },
+//   })
 
-  return await response.json()
-}
+//   return await response.json()
+// }
+
+// let config = getConfig()
 
 let config = fetchRequest(
   `event=get_hallConfig&timestamp=${localStorage.getItem(
@@ -43,28 +43,41 @@ let config = fetchRequest(
   )}&hallId=${localStorage.getItem("hallId")}&seanceId=${localStorage.getItem(
     "seanceId"
   )}`
-).then((data) => console.log(data))
-
-Array.from(
-  document
-    .querySelector(".conf-step__wrapper")
-    .querySelectorAll(".conf-step__chair")
-).forEach((element) => {
-  if (element.classList.contains("conf-step__chair_taken")) {
-    element.style.cursor = "default"
+).then((data) => {
+  console.log(data)
+  if (data == null) {
+    document.querySelector(".conf-step").insertAdjacentHTML(
+      "afterbegin",
+      `<div class="conf-step__wrapper"> 
+    ${localStorage.getItem("hallConfig")}
+  </div>
+  `
+    )
+  } else {
+    document.querySelector(".conf-step").insertAdjacentHTML("afterbegin", data)
   }
 
-  element.onclick = function () {
+  Array.from(
+    document
+      .querySelector(".conf-step__wrapper")
+      .querySelectorAll(".conf-step__chair")
+  ).forEach((element) => {
     if (element.classList.contains("conf-step__chair_taken")) {
-      return false
+      element.style.cursor = "default"
     }
 
-    if (element.classList.contains("conf-step__chair_selected")) {
-      element.classList.remove("conf-step__chair_selected")
-    } else {
-      element.classList.add("conf-step__chair_selected")
+    element.onclick = function () {
+      if (element.classList.contains("conf-step__chair_taken")) {
+        return false
+      }
+
+      if (element.classList.contains("conf-step__chair_selected")) {
+        element.classList.remove("conf-step__chair_selected")
+      } else {
+        element.classList.add("conf-step__chair_selected")
+      }
     }
-  }
+  })
 })
 
 document.querySelector(".acceptin-button").addEventListener("click", () => {
@@ -79,13 +92,17 @@ document.querySelector(".acceptin-button").addEventListener("click", () => {
     )}&hallConfiguration=${hallConfiguration}`
   )
 
-  //     //     // fetch("https://jscp-diplom.netoserver.ru/", {
-  //     //     // method: "POST",
-  //     //     // body: "event=sale_add&timestamp=${value1}&hallId=${value2}&seanceId=${value3}&hallConfiguration=${value4}",
-  //     //     // headers: {
-  //     //     //   "Content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-  //     //     // }
-  //     //   })
+  //   fetch("https://jscp-diplom.netoserver.ru/", {
+  //     method: "POST",
+  //     body: `event=sale_add&timestamp=${localStorage.getItem(
+  //       "timestamp"
+  //     )}&hallId=${localStorage.getItem("hallId")}&seanceId=${localStorage.getItem(
+  //       "seanceId"
+  //     )}&hallConfiguration=${hallConfiguration}`,
+  //     headers: {
+  //       "Content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+  //     },
+  //   })
 })
 
 function getRowChair() {

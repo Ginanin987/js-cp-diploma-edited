@@ -58,22 +58,26 @@ nav.forEach(
     })
 )
 
-async function getList() {
-  const response = await fetch("https://jscp-diplom.netoserver.ru/", {
-    method: "POST",
-    body: "event=update",
-    headers: {
-      "Content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-    },
-  })
-  return await response.json()
-}
+// async function getList() {
+//   const response = await fetch("https://jscp-diplom.netoserver.ru/", {
+//     method: "POST",
+//     body: "event=update",
+//     headers: {
+//       "Content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+//     },
+//   })
+//   return await response.json()
+// }
 
-let list = fetchRequest("event=update").then((data) => {
-  console.log(data)
-  //   console.log(localStorage)
-  for (let film in data.films.result) {
-    document.querySelector("main").innerHTML += `
+let list =
+  //   getList()
+
+  fetchRequest("event=update").then((data) => {
+    console.log(data)
+    //   console.log(localStorage)
+
+    for (let film in data.films.result) {
+      document.querySelector("main").innerHTML += `
   <section class="movie" id="film_${data.films.result[film].film_id}">
         <div class="movie__info">
           <div class="movie__poster">
@@ -100,67 +104,72 @@ let list = fetchRequest("event=update").then((data) => {
       </section>
 
   `
-  }
-
-  for (let seance in data.seances.result) {
-    let film = document.getElementById(
-      `film_${data.seances.result[seance].seance_filmid}`
-    )
-    let hall = document.getElementById(
-      `hall_${data.seances.result[seance].seance_hallid}`
-    )
-    let hallObject = data.halls.result.find(
-      (hall) => hall.hall_id == data.seances.result[seance].seance_hallid
-    )
-
-    if (hallObject.hall_open == 0) {
-      continue
     }
 
-    if (
-      film.querySelector(`#hall_${hallObject.hall_id}`) &&
-      hallObject.hall_open == 1
-    ) {
-      hall.querySelector("ul").insertAdjacentHTML(
-        "beforeend",
-        `<li class="movie-seances__time-block">
+    for (let seance in data.seances.result) {
+      let film = document.getElementById(
+        `film_${data.seances.result[seance].seance_filmid}`
+      )
+      let hall = document.getElementById(
+        `hall_${data.seances.result[seance].seance_hallid}`
+      )
+      let hallObject = data.halls.result.find(
+        (hall) => hall.hall_id == data.seances.result[seance].seance_hallid
+      )
+
+      if (hallObject.hall_open == 0) {
+        continue
+      }
+
+      if (
+        film.querySelector(`#hall_${hallObject.hall_id}`) &&
+        hallObject.hall_open == 1
+      ) {
+        hall.querySelector("ul").insertAdjacentHTML(
+          "beforeend",
+          `<li class="movie-seances__time-block">
         <a class="movie-seances__time" href="hall.html" data-hallId=${
           hallObject.hall_id
         } data-seanceId=${
-          data.seances.result[seance].seance_id
-        } data-seanceTime=${
-          dateTimestamp / 1000 + data.seances.result[seance].seance_start * 60
-        } data-seancestart=${data.seances.result[seance].seance_time} 
+            data.seances.result[seance].seance_id
+          } data-seanceTime=${
+            dateTimestamp / 1000 + data.seances.result[seance].seance_start * 60
+          } data-seancestart=${data.seances.result[seance].seance_time} 
         data-hallname=${hallObject.hall_name}
         data-filmname='${
           data.films.result.find(
             (film) =>
               film.film_id == [data.seances.result[seance].seance_filmid]
           ).film_name
-        }'
+        }' data-hallconfig='${hallObject.hall_config}'
+        data-hallpricestandart=${hallObject.hall_price_standart}
+        data-hallpricevip=${hallObject.hall_price_vip}
         seanceStart="${data.seances.result[seance].seance_start}"
         >${data.seances.result[seance].seance_time}</a>
     </li>`
-      )
+        )
 
-      activeSeance(date)
+        activeSeance(date)
 
-      Array.from(document.querySelectorAll(".movie-seances__time")).forEach(
-        (element) => {
-          element.onclick = function () {
-            localStorage.timestamp = element.dataset.seancetime
-            localStorage.hallId = element.dataset.hallid
-            localStorage.seanceId = element.dataset.seanceid
-            localStorage.seanceStart = element.dataset.seancestart
-            localStorage.filmName = element.dataset.filmname
-            localStorage.hallName = element.dataset.hallname
+        Array.from(document.querySelectorAll(".movie-seances__time")).forEach(
+          (element) => {
+            element.onclick = function () {
+              localStorage.timestamp = element.dataset.seancetime
+              localStorage.hallId = element.dataset.hallid
+              localStorage.seanceId = element.dataset.seanceid
+              localStorage.seanceStart = element.dataset.seancestart
+              localStorage.filmName = element.dataset.filmname
+              localStorage.hallName = element.dataset.hallname
+              localStorage.hallConfig = element.dataset.hallconfig
+              localStorage.hallPriceStandart = element.dataset.hallpricestandart
+              localStorage.hallPriceVip = element.dataset.hallpricevip
+            }
           }
-        }
-      )
-    } else {
-      document.getElementById(
-        `film_${data.seances.result[seance].seance_filmid}`
-      ).innerHTML += `
+        )
+      } else {
+        document.getElementById(
+          `film_${data.seances.result[seance].seance_filmid}`
+        ).innerHTML += `
             <div class="movie-seances__hall" id=hall_${hallObject.hall_id}>
                 <h3 class="movie-seances__hall-title" >${
                   hallObject.hall_name
@@ -176,11 +185,11 @@ let list = fetchRequest("event=update").then((data) => {
                         data-seanceid=${
                           data.seances.result[seance].seance_id
                         } data-seancetime=${
-        Math.trunc(dateTimestamp / 1000) +
-        data.seances.result[seance].seance_start * 60
-      } data-seancestart=${
-        data.seances.result[seance].seance_time
-      } data-hallname=${hallObject.hall_name} 
+          Math.trunc(dateTimestamp / 1000) +
+          data.seances.result[seance].seance_start * 60
+        } data-seancestart=${
+          data.seances.result[seance].seance_time
+        } data-hallname=${hallObject.hall_name} 
       data-filmname='${
         data.films.result.find(
           (film) => film.film_id == [data.seances.result[seance].seance_filmid]
@@ -193,26 +202,26 @@ let list = fetchRequest("event=update").then((data) => {
             </div>
         `
 
-      activeSeance(date)
+        activeSeance(date)
 
-      Array.from(document.querySelectorAll(".movie-seances__time")).forEach(
-        (element) => {
-          element.onclick = function () {
-            localStorage.timestemp = element.dataset.seancetime
-            localStorage.hallId = element.dataset.hallid
-            localStorage.seanceId = element.dataset.seanceid
-            localStorage.seanceStart = element.dataset.seancestart
-            localStorage.filmName = element.dataset.filmname
-            localStorage.hallName = element.dataset.hallname
-            localStorage.hallConfig = element.dataset.hallconfig
-            localStorage.hallPriceStandart = element.dataset.hallpricestandart
-            localStorage.hallPriceVip = element.dataset.hallpricevip
+        Array.from(document.querySelectorAll(".movie-seances__time")).forEach(
+          (element) => {
+            element.onclick = function () {
+              localStorage.timestamp = element.dataset.seancetime
+              localStorage.hallId = element.dataset.hallid
+              localStorage.seanceId = element.dataset.seanceid
+              localStorage.seanceStart = element.dataset.seancestart
+              localStorage.filmName = element.dataset.filmname
+              localStorage.hallName = element.dataset.hallname
+              localStorage.hallConfig = element.dataset.hallconfig
+              localStorage.hallPriceStandart = element.dataset.hallpricestandart
+              localStorage.hallPriceVip = element.dataset.hallpricevip
+            }
           }
-        }
-      )
+        )
+      }
     }
-  }
-})
+  })
 
 function activeSeance(time) {
   let time_now = time.getHours() * 60 + time.getMinutes()
