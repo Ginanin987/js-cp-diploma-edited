@@ -70,8 +70,7 @@ nav.forEach(
 // }
 
 let list =
-  //   getList()
-
+  // getList()
   fetchRequest("event=update").then((data) => {
     console.log(data)
     //   console.log(localStorage)
@@ -144,7 +143,15 @@ let list =
         }' data-hallconfig='${hallObject.hall_config}'
         data-hallpricestandart=${hallObject.hall_price_standart}
         data-hallpricevip=${hallObject.hall_price_vip}
+        data-seancedate = '${
+          date.getFullYear() +
+          "-" +
+          (date.getMonth() + 1) +
+          "-" +
+          date.getDate()
+        }'
         seanceStart="${data.seances.result[seance].seance_start}"
+        
         >${data.seances.result[seance].seance_time}</a>
     </li>`
         )
@@ -163,6 +170,7 @@ let list =
               localStorage.hallConfig = element.dataset.hallconfig
               localStorage.hallPriceStandart = element.dataset.hallpricestandart
               localStorage.hallPriceVip = element.dataset.hallpricevip
+              localStorage.seanceDate = element.dataset.seancedate
             }
           }
         )
@@ -195,6 +203,9 @@ let list =
           (film) => film.film_id == [data.seances.result[seance].seance_filmid]
         ).film_name
       }'
+      data-seancedate = '${
+        date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate()
+      }'
       seanceStart="${data.seances.result[seance].seance_start}">
                         ${data.seances.result[seance].seance_time}</a>
                     </li>
@@ -216,6 +227,7 @@ let list =
               localStorage.hallConfig = element.dataset.hallconfig
               localStorage.hallPriceStandart = element.dataset.hallpricestandart
               localStorage.hallPriceVip = element.dataset.hallpricevip
+              localStorage.seanceDate = element.dataset.seancedate
             }
           }
         )
@@ -239,4 +251,4 @@ function activeSeance(time) {
   )
 }
 
-// console.log(date)
+// console.log(date.getMonth())

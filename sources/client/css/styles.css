@@ -409,17 +409,17 @@ body {
 .ticket__hint {
   font-weight: 300;
   font-size: 1.4rem;
-  margin-top: 3rem;
+  margin-top: 2rem;
 }
 .ticket__hint + .ticket__hint {
-  margin-top: 1rem;
+  margin-top: 2rem;
 }
 
 .ticket__info-qr {
   display: block;
   margin: 3rem auto 0;
-  width: 20rem;
-  height: 20rem;
+  width: 25rem;
+  height: 25rem;
 }
 
 @media screen and (min-width: 479px) {
