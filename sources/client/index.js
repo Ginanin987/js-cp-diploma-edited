@@ -132,7 +132,8 @@ let list =
         } data-seanceId=${
             data.seances.result[seance].seance_id
           } data-seanceTime=${
-            dateTimestamp / 1000 + data.seances.result[seance].seance_start * 60
+            Math.trunc(dateTimestamp / 1000) +
+            data.seances.result[seance].seance_start * 60
           } data-seancestart=${data.seances.result[seance].seance_time} 
         data-hallname=${hallObject.hall_name}
         data-filmname='${
