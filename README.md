@@ -1,6 +1,6 @@
 # Ссылка на GitHubPages
 
-https://ginanin987.github.io/js-cp-diploma-edited/sources/client/index.html#
+[GitHubPages](https://ginanin987.github.io/js-cp-diploma-edited/sources/client/index.html#)
 
 # Дипломное задание по курсу «JavaScript-программирование для начинающих»
 

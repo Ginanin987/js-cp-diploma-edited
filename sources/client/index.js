@@ -47,10 +47,6 @@ nav.forEach(
 
       element.classList.add("page-nav__day_chosen")
 
-      element.querySelector(".page-nav__day_chosen")
-
-      console.log("onclick")
-
       if (element.classList.contains("page-nav__day_today")) {
         date = new Date()
         activeSeance(date)
